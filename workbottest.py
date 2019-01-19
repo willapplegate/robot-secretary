@@ -354,10 +354,12 @@ def event_creation(date_list, CAL, caseNO):
 
 
 def insert_event(startTime, endTime, eventSummary, eventLocation, caseNO, CAL):
+
+	now = str(datetime.date.now())
 	event = {
 		'summary': eventSummary,
-		'location': eventLocation,
-		'description': 'Event created automatically using case no: ' + caseNO + ' on ' + datetime.now() + '.',
+
+		'description': 'Event created automatically using case no: ' + caseNO + ' on ' + now + '. In' + eventLocation,
 		'start': {
 			'dateTime': startTime,
 			'timeZone': 'America/Los_Angeles',
@@ -378,7 +380,7 @@ def insert_event(startTime, endTime, eventSummary, eventLocation, caseNO, CAL):
 		},
 	}
 
-	event = CAL.events().insert(calendarId='primary', body=event).execute()
+	event = CAL.events().insert(calendarId='greylawcalendar@gmail.com', body=event).execute()
 	print
 	'Event created: %s' % (event.get('htmlLink'))
 
