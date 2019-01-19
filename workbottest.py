@@ -409,7 +409,7 @@ def check_event(caseName, keyWord, dateTime, CAL):
 			for item in nameList:
 				if item in summaryList:
 					#print title of all events with both word from case name and keyword
-					print('Match Found ' + str(item))
+					print('Match Found: ' + str(item) + ' and ' + keyWord)
 
 
 					try:
@@ -443,18 +443,21 @@ def check_event(caseName, keyWord, dateTime, CAL):
 
 				else:
 					results = 2
-		return results
+
 
 
 
 
 
 					#check if startTime matches time
-
+		return results
 
 		page_token = events.get('nextPageToken')
+
 		if not page_token:
 			break
+
+
 
 def change_event(eventId, dateTime, CAL):
 	event = CAL.events().get(calendarId='greylawcalendar@gmail.com', eventId=eventId).execute()
