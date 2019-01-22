@@ -20,7 +20,6 @@ def main():
 			caseNO = caseNO.rstrip()
 			gather_soup(caseNO, n)
 			trim_soup()
-			chunk_creation()
 			with open('output.txt','at') as outwards:
 				date_List = universalize(parse_chunk(chunk_creation()))
 				outwards.write(caseNO + ': \n' + str(date_List) + '\n')
@@ -28,8 +27,8 @@ def main():
 
 
 
-			print('results logged')
-			time.sleep(3)
+
+			time.sleep(1)
 
 			n = n + 1
 
@@ -97,6 +96,9 @@ def chunk_creation():
 				Filing = str(line)
 				#append list w filing date
 				chunkL.append(Filing)
+			# if "at" in line:
+			# 	at = str(line)
+			# 	chunkL.append(at)
 			if "Final Status Conference" in line:
 				'/n'
 				FSC = str(line)
@@ -121,77 +123,116 @@ def chunk_creation():
 
 def parse_chunk(byWord):
 	#modify byWord to break between info points
-	indexConference = byWord.index('Conference')
-	indexTrial = byWord.index('Trial')
-	indexDismissal = byWord.index('Dismissal')
-	#indexName = byWord.index('VS')
 	indexFiling = byWord.index('Filing')
-
-
-
-	Filing = byWord[indexFiling:indexFiling+3]
-	FSC = byWord[indexFiling+3:indexConference-1]
-	Trial = byWord[indexConference:indexTrial]
-	OSC = byWord[indexTrial:indexDismissal]
 	Name = byWord[0:indexFiling]
+	Name = "Name: " + ' '.join(Name)
+	Filing = byWord[indexFiling:indexFiling + 3]
 
-
-	#pull dates for gcal integration
 	filingDate = Filing[2].split('/')
 	filingMonth = int(filingDate[0])
 	filingDay = int(filingDate[1])
 	filingYear = int(filingDate[2])
 
-	FSCdate = FSC[0].split('/')
-	FSCmonth = int(FSCdate[0])
-	FSCday = int(FSCdate[1])
-	FSCyear = int(FSCdate[2])
-	FSCtime = FSC[2].split(':')
-	FSChour = int(FSCtime[0])
-	FSCminute = int(FSCtime[1])
-
-	trialDate = Trial[1].split('/')
-	trialMonth = int(trialDate[0])
-	trialDay = int(trialDate[1])
-	trialYear = int(trialDate[2])
-	trialTime = Trial[3].split(':')
-	trialHour = int(trialTime[0])
-	trialMinute = int(trialTime[1])
-
-	OSCdate = OSC[1].split('/')
-	OSCmonth = int(OSCdate[0])
-	OSCday = int(OSCdate[1])
-	OSCyear = int(OSCdate[2])
-	OSCtime = OSC[3].split(':')
-	OSChour = int(OSCtime[0])
-	OSCminute = int(OSCtime[1])
-
 	filingDateTime = datetime.date(filingYear, filingMonth, filingDay).isoformat()
-
-
-	FSCdatetime = datetime.datetime(FSCyear, FSCmonth, FSCday, FSChour, FSCminute).isoformat()
-
-
-	trialDateTime = datetime.datetime(trialYear, trialMonth, trialDay, trialHour, trialMinute).isoformat()
-
-
-	OSCdatetime = datetime.datetime(OSCyear, OSCmonth, OSCday, OSChour, OSCminute).isoformat()
-
-
-
-
-
-
-	#create return values for output to text file.
 	Filing = "Filing Date: " + filingDateTime
-	Trial = "Trial: " + trialDateTime + ' ' + ' '.join(Trial[5:len(Trial)-2])
-	FSC = "FSC: " + FSCdatetime + ' ' + ' '.join(FSC[5:len(FSC)-1])
-	OSC = "OSC: " + OSCdatetime + ' ' + ' '.join(OSC[6:len(OSC)-3])
-	Name = "Name: " + ' '.join(Name)
+
+	if 'Conference' and 'Trial' and 'Dismissal' in byWord:
+		indexConference = byWord.index('Conference')
+		indexTrial = byWord.index('Trial')
+		indexDismissal = byWord.index('Dismissal')
+		#indexName = byWord.index('VS')
+
+		FSC = byWord[indexFiling+3:indexConference-1]
+		Trial = byWord[indexConference:indexTrial]
+		OSC = byWord[indexTrial:indexDismissal]
 
 
 
-	parsed_data = Name + '\n' + Filing + '\n' + Trial + '\n' + FSC + '\n' + OSC
+		#pull dates for gcal integration
+
+
+		FSCdate = FSC[0].split('/')
+		FSCmonth = int(FSCdate[0])
+		FSCday = int(FSCdate[1])
+		FSCyear = int(FSCdate[2])
+		FSCtime = FSC[2].split(':')
+		FSChour = int(FSCtime[0])
+		FSCminute = int(FSCtime[1])
+
+		trialDate = Trial[1].split('/')
+		trialMonth = int(trialDate[0])
+		trialDay = int(trialDate[1])
+		trialYear = int(trialDate[2])
+		trialTime = Trial[3].split(':')
+		trialHour = int(trialTime[0])
+		trialMinute = int(trialTime[1])
+
+		OSCdate = OSC[1].split('/')
+		OSCmonth = int(OSCdate[0])
+		OSCday = int(OSCdate[1])
+		OSCyear = int(OSCdate[2])
+		OSCtime = OSC[3].split(':')
+		OSChour = int(OSCtime[0])
+		OSCminute = int(OSCtime[1])
+
+
+
+
+		FSCdatetime = datetime.datetime(FSCyear, FSCmonth, FSCday, FSChour, FSCminute).isoformat()
+
+
+		trialDateTime = datetime.datetime(trialYear, trialMonth, trialDay, trialHour, trialMinute).isoformat()
+
+
+		OSCdatetime = datetime.datetime(OSCyear, OSCmonth, OSCday, OSChour, OSCminute).isoformat()
+
+
+
+
+
+
+		#create return values for output to text file.
+
+		Trial = "Trial: " + trialDateTime + ' ' + ' '.join(Trial[5:len(Trial)-2])
+		FSC = "FSC: " + FSCdatetime + ' ' + ' '.join(FSC[5:len(FSC)-1])
+		OSC = "OSC: " + OSCdatetime + ' ' + ' '.join(OSC[6:len(OSC)-3])
+
+
+
+
+		parsed_data = Name + '\n' + Filing + '\n' + Trial + '\n' + FSC + '\n' + OSC
+	else:
+		for item in byWord:
+			if item == 'at':
+				atIndex = byWord.index(item)
+				tempDate = byWord[atIndex-1]
+				tempTime = byWord[atIndex+1]
+				tempTime = tempTime.split(':')
+				tempDate = tempDate.split('/')
+				dateMonth = int(tempDate[0])
+				dateDay = int(tempDate[1])
+				dateYear = int(tempDate[2])
+				dateHour = int(tempTime[0])
+				dateMinute = int(tempTime[1])
+
+				tempDateTime = datetime.datetime(dateYear, dateMonth, dateDay, dateHour, dateMinute)
+				now = datetime.datetime.now()
+				if tempDateTime > now:
+					#keyWord =
+					pass
+				else:
+					pass
+
+
+
+
+
+
+
+
+
+		parsed_data = Name + '\n' + Filing + '\n'
+
 
 
 
@@ -235,7 +276,8 @@ def event_creation(date_list, CAL, caseNO):
 
 			if result == 1:
 				#preexisting event found on correct date
-				print('Preexisting event found for ' + keyWord + ' for ' + caseName + ' on correct date: ' + FSCdate)
+				#print('Preexisting event found for ' + keyWord + ' for ' + caseName + ' on correct date: ' + FSCdate)
+				pass
 			elif (result != 1) and (result != 2):
 				#preexisting event found on incorrect date
 				#change date function
@@ -270,7 +312,8 @@ def event_creation(date_list, CAL, caseNO):
 			result = check_event(caseName, keyWord, OSCdate, CAL)
 			if result == 1:
 				#preexisting event found on correct date
-				print('Preexisting event found for ' + keyWord + ' for ' + caseName + ' on correct date: ' + OSCdate)
+				#print('Preexisting event found for ' + keyWord + ' for ' + caseName + ' on correct date: ' + OSCdate)
+				pass
 			elif (result != 1) and (result != 2):
 				#preexisting event found on incorrect date
 				#change date function
@@ -306,12 +349,13 @@ def event_creation(date_list, CAL, caseNO):
 
 			if result == 1:
 				#preexisting event found on correct date
-				print('Preexisting event found for ' + keyWord + ' for ' + caseName + ' on correct date: ' + Trialdate)
+				#print('Preexisting event found for ' + keyWord + ' for ' + caseName + ' on correct date: ' + Trialdate)
+				pass
 			elif (result != 1) and (result) != 2:
 				#preexisting event found on incorrect date
 				#change date function
 				print('Preexisting event found for ' + keyWord + ' for ' + caseName + ' on INCORRECT DATE. Changing event to ' + Trialdate)
-				print('Return: ' + str(result))
+
 				eventId = result
 				change_event(eventId, Trialdate, CAL)
 				print(keyWord + ' date has been changed to ' + Trialdate)
@@ -355,11 +399,12 @@ def event_creation(date_list, CAL, caseNO):
 
 def insert_event(startTime, endTime, eventSummary, eventLocation, caseNO, CAL):
 
-	now = str(datetime.date.now())
+	now = str(datetime.datetime.now())
+	eventLocation = ' '.join(eventLocation)
 	event = {
 		'summary': eventSummary,
 
-		'description': 'Event created automatically using case no: ' + caseNO + ' on ' + now + '. In' + eventLocation,
+		'description': 'Event created automatically using case no: ' + caseNO + ' on ' + now + '. Event located in ' + eventLocation,
 		'start': {
 			'dateTime': startTime,
 			'timeZone': 'America/Los_Angeles',
@@ -368,9 +413,9 @@ def insert_event(startTime, endTime, eventSummary, eventLocation, caseNO, CAL):
 			'dateTime': endTime,
 			'timeZone': 'America/Los_Angeles',
 		},
-		'attendees': [
-			{'email': 'molchanlaw@yahoo.com'},
-		],
+		# 'attendees': [
+		# 	{'email': 'molchanlaw@yahoo.com'},
+		# ],
 		'reminders': {
 			'useDefault': False,
 			'overrides': [
@@ -381,7 +426,7 @@ def insert_event(startTime, endTime, eventSummary, eventLocation, caseNO, CAL):
 	}
 
 	event = CAL.events().insert(calendarId='greylawcalendar@gmail.com', body=event).execute()
-	print
+
 	'Event created: %s' % (event.get('htmlLink'))
 
 def check_event(caseName, keyWord, dateTime, CAL):
@@ -436,7 +481,7 @@ def check_event(caseName, keyWord, dateTime, CAL):
 
 					else:
 						print('incorrect date')
-						print(event['id'])
+
 						results = event['id']
 
 
