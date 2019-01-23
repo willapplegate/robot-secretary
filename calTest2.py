@@ -23,8 +23,11 @@ def main():
             trim_soup()
             with open('output.txt','at') as outwards:
                 date_List = universalize(parse_chunk(chunk_creation()))
-                outwards.write(caseNO + ': \n' + str(date_List) + '\n')
-            event_creation(date_List, CAL, caseNO)
+                if date_List == 'NoneError':
+                    pass
+                else:
+                    outwards.write(caseNO + ': \n' + str(date_List) + '\n')
+                    event_creation(date_List, CAL, caseNO)
 
 
 
@@ -214,12 +217,19 @@ def parse_chunk(byWord):
 
 
         parsed_data = Name + '\n' + Filing + '\n' + Trial + '\n' + FSC + '\n' + OSC
+        return parsed_data
     else:
         n = 1
+        result1 = []
+        
+        print(byWord)
+        if 'at' not in byWord:
+            return 'NoneError'
         for item in byWord:
 
             if item == 'at':
                 n += 1
+
                 try:
                     atIndex = byWord.index(item)
                     tempDate = byWord[atIndex - 1]
@@ -240,24 +250,41 @@ def parse_chunk(byWord):
                     if tempDateTime > now:
 
                         keyDate = 'KeyDate: ' + tempDateTime
+                        result1.append('UnknownType: ' + Name + ' \n ' + Filing + ' \n ' + keyDate)
 
 
                 except:
-                    pass
+                    if len(result1) == 0:
+
+                        return 'NoneError'
+                    else:
+
+                        pass
 
 
-        parsed_data = 'UnknownType: ' + Name + '\n' + Filing + '\n' + keyDate
+
+
+        return result1
 
 
 
 
 
-    return parsed_data
+
 
 def universalize(date_string):
-    date_list = re.split('[ \n]', date_string)
-    print(date_list)
-    return date_list
+    if date_string == 'NoneError':
+        return 'NoneError'
+    else:
+        try:
+            date_list = re.split('[ \n]', date_string)
+            print(date_list)
+            return date_list
+        except:
+            date_string = ' '.join(date_string)
+            date_list = re.split('[ \n]', date_string)
+            print(date_list)
+            return date_list
 
 
 # def event_creation(date_list):
